@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morse Code Maestro - Premium Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --secondary-color: #3F3D56;
+            --background-color: #F9FAFC;
+            --text-color: #2C2C2C;
+            --accent-color: #FF6584;
+            --success-color: #4CAF50;
+            --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .container {
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            padding: 3rem;
+            width: 90%;
+            max-width: 800px;
+            transition: transform 0.3s ease;
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            letter-spacing: 1px;
+        }
+        
+        .input-group, .output-group {
+            margin-bottom: 2rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        #playButton {
+            background-color: var(--accent-color);
+        }
+        
+        #playButton:hover {
+            background-color: #ff4757;
+        }
+        
+        #stopButton {
+            background-color: var(--secondary-color);
+        }
+        
+        #stopButton:hover {
+            background-color: #2c3e50;
+        }
+        
+        #output {
+            background-color: var(--background-color);
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Roboto Mono', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            min-height: 100px;
+        }
+        
+        .audio-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        
+        #wpm {
+            margin: 0 15px;
+            -webkit-appearance: none;
+            width: 200px;
+            height: 8px;
+            background: #d3d3d3;
+            outline: none;
+            border-radius: 5px;
+        }
+        
+        #wpm::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        
+        #wpm::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        
+        .morse-guide {
+            margin-top: 3rem;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .morse-guide h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .morse-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .morse-item {
+            background-color: var(--background-color);
+            border-radius: 8px;
+            padding: 0.8rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .morse-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 2rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <h1>Morse Code Maestro</h1>
+        <div class="input-group">
+            <label for="input">Enter text or Morse code:</label>
+            <textarea id="input" rows="4" placeholder="Type your message here..."></textarea>
+        </div>
+        <div class="buttons">
+            <button id="translateButton">Translate</button>
+            <button id="clearButton">Clear</button>
+            <button id="playButton">Play Morse</button>
+            <button id="stopButton">Stop Morse</button>
+        </div>
+        <div class="output-group">
+            <label for="output">Result:</label>
+            <div id="output"></div>
+        </div>
+        <div class="audio-controls">
+            <label for="wpm">Speed (WPM):</label>
+            <input type="range" id="wpm" min="5" max="30" value="15">
+            <span id="wpmValue">15</span>
+        </div>
+        <div class="morse-guide">
+            <h3>Morse Code Guide</h3>
+            <div class="morse-table" id="morseGuide"></div>
+        </div>
+    </div>
+    <script>
+        const morseCode = {
+            'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+            'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+            'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+            'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+            'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---',
+            '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...',
+            '8': '---..', '9': '----.'
+        };
+
+        const reverseMorseCode = Object.fromEntries(
+            Object.entries(morseCode).map(([key, value]) => [value, key])
+        );
+
+        function translate() {
+            const input = document.getElementById('input').value.trim().toUpperCase();
+            let output = '';
+
+            if (input.includes('.') || input.includes('-')) {
+                // Morse to text
+                const words = input.split('   ');
+                output = words.map(word => {
+                    return word.split(' ').map(char => {
+                        return reverseMorseCode[char] || char;
+                    }).join('');
+                }).join(' ');
+            } else {
+                // Text to Morse
+                output = input.split('').map(char => {
+                    return morseCode[char] || char;
+                }).join(' ');
+            }
+
+            const outputElement = document.getElementById('output');
+            outputElement.textContent = output;
+            outputElement.classList.add('fade-in');
+            setTimeout(() => outputElement.classList.remove('fade-in'), 500);
+        }
+
+        function clearInput() {
+            document.getElementById('input').value = '';
+            document.getElementById('output').textContent = '';
+        }
+
+        function updateWPM() {
+            const wpm = document.getElementById('wpm').value;
+            document.getElementById('wpmValue').textContent = wpm;
+        }
+
+        let audioContext;
+        let oscillator;
+        let gainNode;
+
+        function playMorseCode() {
+            const morseText = document.getElementById('output').textContent;
+            const wpm = document.getElementById('wpm').value;
+            const dotDuration = 1.2 / wpm;
+
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            stopMorseCode();
+
+            oscillator = audioContext.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+
+            gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+
+            let time = audioContext.currentTime;
+
+            for (const char of morseText) {
+                if (char === '.') {
+                    gainNode.gain.setValueAtTime(1, time);
+                    time += dotDuration;
+                    gainNode.gain.setValueAtTime(0, time);
+                    time += dotDuration;
+                } else if (char === '-') {
+                    gainNode.gain.setValueAtTime(1, time);
+                    time += 3 * dotDuration;
+                    gainNode.gain.setValueAtTime(0, time);
+                    time += dotDuration;
+                } else if (char === ' ') {
+                    time += 3 * dotDuration;
+                }
+            }
+
+            oscillator.stop(time);
+        }
+
+        function stopMorseCode() {
+            if (oscillator) {
+                oscillator.stop();
+                oscillator.disconnect();
+            }
+            if (gainNode) {
+                gainNode.disconnect();
+            }
+        }
+
+        function populateMorseGuide() {
+            const guideElement = document.getElementById('morseGuide');
+            for (const [char, code] of Object.entries(morseCode)) {
+                const item = document.createElement('div');
+                item.className = 'morse-item';
+                item.textContent = `${char}: ${code}`;
+                guideElement.appendChild(item);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.getElementById('translateButton').addEventListener('click', translate);
+            document.getElementById('clearButton').addEventListener('click', clearInput);
+            document.getElementById('playButton').addEventListener('click', playMorseCode);
+            document.getElementById('stopButton').addEventListener('click', stopMorseCode);
+            document.getElementById('wpm').addEventListener('input', updateWPM);
+            populateMorseGuide();
+        });
+    </script>
+</body>
+</html>
